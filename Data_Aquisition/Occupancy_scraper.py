@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+
+    @file     Occupancy_scraper.py
+    @author   Colin Laganier
+    @version  V0.3
+    @date     2021-12-05
+    @brief    This script scrapes the Imperial Occupancy platform to retrieve the occupancy of Level 2.
+"""
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -9,14 +18,11 @@ import config
 import random
 from datetime import datetime
 
-broker = '146.169.220.92'
-# broker = "localhost"
+broker = config.IPAddress
 port = 1883
 topic = "smellStation/occupancy"
 # generate client ID with pub prefix randomly
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
-# username = 'emqx'
-# password = 'public'
 
 
 def ConnectMQTT():
@@ -27,7 +33,7 @@ def ConnectMQTT():
             print("Failed to connect, return code %d\n", rc)
 
     client = mqtt_client.Client(client_id)
-    # client.username_pw_set(username, password)
+    # client.username_pw_set(config.username, config.password)
     client.on_connect = on_connect
     client.connect(broker, port)
     return client
@@ -36,9 +42,7 @@ def ConnectMQTT():
 def Publish(client):
 
     current_occupancy = GetOccupancy()
-    # if current_occupancy != -1:
     result = client.publish(topic, current_occupancy)
-    # result: [0, 1]
     status = result[0]
     if status == 0:
         print(f"Sent message - sleep for 60 seconds")
@@ -58,7 +62,6 @@ def PublishExpected():
 
 def MQTT():
     client = ConnectMQTT()
-    # client.loop_start()
     if PublishExpected():
         Publish(client)
 
@@ -96,6 +99,5 @@ def GetOccupancy():
 
 
 if __name__ == '__main__':
-    # GetOccupancy()
     while True:
         MQTT()

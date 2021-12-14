@@ -59,7 +59,6 @@ bool PublishExpected()
     Serial.println("Failed to obtain time");
     return false;
   }
-  //  Serial.print("obtained time");
   if (timeinfo.tm_min % 10 == 0)
   {
     return true;
@@ -107,21 +106,6 @@ void callback(char* topic, byte* message, unsigned int length) {
     messageTemp += (char)message[i];
   }
   Serial.println();
-
-  // Feel free to add more if statements to control more GPIOs with MQTT
-
-  // If a message is received on the topic test/message, you check if the message is either "on" or "off".
-  // Changes the output state according to the message
-  if (String(topic) == "test/message") {
-    Serial.print("Changing output to ");
-    if (messageTemp == "on") {
-      Serial.println("on");
-      //      digitalWrite(ledPin, HIGH);
-    }
-    else if (messageTemp == "off") {
-      Serial.println("off");
-    }
-  }
 }
 
 // Function to reconnect the MQTT client to the broker in case the connection is lost
@@ -132,7 +116,6 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(device_name)) {
       Serial.println("connected");
-      // Subscribe
       failCounter = 0;
       for (int i = 0; i < 3; i++)
       {

@@ -8,7 +8,9 @@ Arduino code for data acquisition and Python script for data processing by Colin
 
 ## Hardware
 
-![Hardware](./Figures/Hardware_Sensors.jpg)
+<p align="center">
+  <img src="./Figures/Hardware_Sensors.jpg" width="500">
+</p>
 
 -ESP32 (x3)
 
@@ -42,4 +44,4 @@ The raw sensor and pre-processed datasets can be found in "Data_Processing/Expor
 
 ![Dashboard](./Figures/Dyson_Smell_Station_Dashboard.jpg)
 
-The dashboard can be accessed on colinlaganier.com/siot
+The dashboard can be accessed on [my personal website](http://colinlaganier.com/siot)

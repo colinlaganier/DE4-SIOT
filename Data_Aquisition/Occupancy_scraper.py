@@ -75,6 +75,7 @@ def GetOccupancy():
         try:
             browser.get(config.url)
             sleep(5)
+            # Login to platform
             login_elem = browser.find_elements(
                 By.XPATH, "//*[@class='align-center background-green display-block clickable mb4 px2 py3 font-size-3 font-normal']")[0]
             login_elem.click()

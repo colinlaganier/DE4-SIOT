@@ -1,11 +1,11 @@
 /************************************************************************************
     @file     ESP32_sensor.ino
     @author   Colin Laganier
-    @version  V0.1
+    @version  V0.4
     @date     2021-12-05
     @brief   This
   **********************************************************************************
-    @attention  Requires standard Arduino Libraries: PubSubClient.h
+    @attention  Requires non-standard Arduino Libraries: PubSubClient.h, DHTesp.h
 */
 
 #include "passwords.h"
@@ -15,20 +15,20 @@
 #include <PubSubClient.h>
 #include "DHTesp.h"
 
-// Variables
+/***  Variables  ***/
 
 // WiFi Parameters
-const char* ssid = "Imperial-WPA";
+const char *ssid = "Imperial-WPA";
 
 // MQTT Parameters
-const char* mqtt_server = "146.169.185.200";
-const char* device_name = "ESP32_sensor";
-const char* mqtt_topic[3] = { "smellStation/H2S", "smellStation/temperature", "smellStation/humidity" };
+const char *mqtt_server = "146.169.185.200";
+const char *device_name = "ESP32_sensor";
+const char *mqtt_topic[3] = {"smellStation/H2S", "smellStation/temperature", "smellStation/humidity"};
 int failCounter = 0;
 
 // Time Server Parameters
-const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 3600;
+const char *ntpServer = "pool.ntp.org";
+const long gmtOffset_sec = 3600;
 
 // DHT Sensor Parameters
 DHTesp dht;
@@ -45,17 +45,21 @@ char msg[50];
 int value = 0;
 
 // Function Prototypes
-void setup_wifi();
-void callback(char* topic, byte* message, unsigned int length);
+void SetupWifi();
+void callback(char *topic, byte *message, unsigned int length);
 void reconnect();
 bool PublishExpected();
 float GetSensorData();
 int CalculateVolume();
 
+/***  Funcitons  ***/
+
+// Verifies if sensor reading is expected
 bool PublishExpected()
 {
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
+  if (!getLocalTime(&timeinfo))
+  {
     Serial.println("Failed to obtain time");
     return false;
   }
@@ -64,10 +68,10 @@ bool PublishExpected()
     return true;
   }
   return false;
-
 }
 
-void setup_wifi() {
+void SetupWifi()
+{
   Serial.println((String)EAP_USERNAME);
   Serial.println();
   Serial.print("Connecting to ");
@@ -84,7 +88,8 @@ void setup_wifi() {
 
   WiFi.begin(ssid);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -95,13 +100,16 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void callback(char* topic, byte* message, unsigned int length) {
+// Callback when message arrives on MQTT topic
+void callback(char *topic, byte *message, unsigned int length)
+{
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
   Serial.print(". Message: ");
   String messageTemp;
 
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     Serial.print((char)message[i]);
     messageTemp += (char)message[i];
   }
@@ -109,20 +117,26 @@ void callback(char* topic, byte* message, unsigned int length) {
 }
 
 // Function to reconnect the MQTT client to the broker in case the connection is lost
-void reconnect() {
+void reconnect()
+{
   // Loop until we're reconnected
-  while (!client.connected()) {
+  while (!client.connected())
+  {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(device_name)) {
+    if (client.connect(device_name))
+    {
       Serial.println("connected");
       failCounter = 0;
       for (int i = 0; i < 3; i++)
       {
         client.subscribe(mqtt_topic[i]);
       }
-    } else {
-      if (failCounter == 5){
+    }
+    else
+    {
+      if (failCounter == 5)
+      {
         ESP.restart();
       }
       Serial.print("failed, rc=");
@@ -135,11 +149,12 @@ void reconnect() {
   }
 }
 
-void setup() {
+void setup()
+{
   // Serial monitor initialisation
   Serial.begin(115200);
 
-  setup_wifi();
+  SetupWifi();
 
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -149,13 +164,15 @@ void setup() {
   configTime(gmtOffset_sec, 0, ntpServer);
 }
 
-void loop() {
-  if (!client.connected()) {
+void loop()
+{
+  if (!client.connected())
+  {
     reconnect();
   }
-  //  client.loop();
   if (PublishExpected())
   {
+    // Get reading from temperature & humidity sensor
     TempAndHumidity _measurement = dht.getTempAndHumidity();
     if (dht.getStatus() != 0)
     {
@@ -172,14 +189,16 @@ void loop() {
       client.publish(mqtt_topic[2], _humidityBuffer);
     }
 
+    // Get reading from H2S sensor
     _gasMeasurement = analogRead(sensorPin);
     char _H2SBuffer[8];
     itoa(_gasMeasurement, _H2SBuffer, 10);
     client.publish(mqtt_topic[0], _H2SBuffer);
+
     Serial.println((String) "temp: " + _measurement.temperature + " humidity: " + _measurement.humidity + " H2S: " + _H2SBuffer);
+
     delay(60000);
   }
+
   client.loop();
-
-
 }

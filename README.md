@@ -40,7 +40,7 @@ Arduino code for data acquisition and Python script for data processing by Colin
 
 ## Datasets
 
-The raw sensor and pre-processed datasets can be found in "Data_Processing/Export_Data".
+The raw sensor and pre-processed datasets can be found in [Data_Processing/Export_Data](Data_Processing/Export_Data).
 
 ![Dashboard](./Figures/Dyson_Smell_Station_Dashboard.jpg)
 

@@ -20,12 +20,10 @@
 *.pyo    binary export-ignore
 *.pyd    binary
 
-# Jupyter notebook
-#*.ipynb  text
+notebooks/** linguist-vendored
 
 # Note: .db, .p, and .pkl files are associated
 # with the python modules ``pickle``, ``dbm.*``,
 # ``shelve``, ``marshal``, ``anydbm``, & ``bsddb``
 # (among others).
 
-notebooks/** linguist-vendored

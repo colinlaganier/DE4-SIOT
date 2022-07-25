@@ -20,7 +20,7 @@
 *.pyo    binary export-ignore
 *.pyd    binary
 
-notebooks/** linguist-vendored
+Data_Processing/** linguist-vendored
 
 # Note: .db, .p, and .pkl files are associated
 # with the python modules ``pickle``, ``dbm.*``,
